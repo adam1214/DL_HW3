@@ -5,7 +5,6 @@ import os
 import random
 import argparse
 from argparse import RawTextHelpFormatter
-import pdb
 
 random.seed(123)
 np.random.seed(123)
@@ -63,9 +62,9 @@ class CNN:
         :return:
         """
         N = X.shape[0]
-        delta = np.dot(next_dX, W.T)  # 当前层的梯度
-        dw = np.dot(X.T, next_dX)  # 当前层权重的梯度
-        db = np.sum(next_dX, axis=0)  # 当前层偏置的梯度, N个样本的梯度求和
+        delta = np.dot(next_dX, W.T)  # 當前層的梯度
+        dw = np.dot(X.T, next_dX)  # 當前層權重的梯度
+        db = np.sum(next_dX, axis=0)  # 當前層偏置的梯度, N个樣本的梯度求和
         return dw / N, db / N, delta
     
     def Zeros_remove(self, X, padding): #移除padding
@@ -85,7 +84,7 @@ class CNN:
     
     def Zeros_padding(self, dX, strides): #想多維數组最後兩位，每個行列之間增加指定的個數的零填充
         """
-        :param dX: (N,D,H,W),H,W為卷積输出層的高度和寬度
+        :param dX: (N,D,H,W),H,W為卷積輸出層的高度和寬度
         :param strides: 步長
         :return:
         """
@@ -104,9 +103,9 @@ class CNN:
     def convolution_forward(self, X_input, Kernel, b, padding=(0, 0), strides=(1, 1)):
         """
         多通道卷積前向過程
-        :param X: 卷基層矩陣, 形状(N,C,H,W)，N为batch_size，C為通道数
-        :param Kernel: 卷積核, 形状(C,D,k1,k2), C為输入通道数，D為输出通道数
-        :param b: bias, 形状(D,)
+        :param X: 卷積層矩陣, 形狀(N,C,H,W)，N為batch_size，C為通道數
+        :param Kernel: 卷積核, 形狀(C,D,k1,k2), C為輸入通道数，D為輸出通道數
+        :param b: bias, 形狀(D,)
         :param padding: padding
         :param strides: 步長
         :return: 卷積結果
@@ -133,9 +132,9 @@ class CNN:
     def convolution_backward(self, next_dX, Kernel, X, padding=(0, 0), strides=(1, 1)):
         """
         多通道卷積層的反向過程
-        :param next_dX: 卷積输出層的梯度,(N,D,H',W'),H',W'为卷积输出层的高度和宽度
+        :param next_dX: 卷積輸出層的梯度,(N,D,H',W'),H',W'為卷積輸出層的高度和寬度
         :param Kernel: 當前層卷積核，(C,D,k1,k2)
-        :param X: 卷積層矩陣,形状(N,C,H,W)，N为batch_size，C为通道数
+        :param X: 卷積層矩陣,形狀(N,C,H,W)，N為batch_size，C為通道數
         :param padding: padding
         :param strides: 步長
         :return:
@@ -159,7 +158,7 @@ class CNN:
         dX = self.convolution_forward(ppadding_next_dX.astype(np.float64), switch_flip_K.astype(np.float64), np.zeros((C,), dtype=np.float64))
     
         # 求卷積核的梯度dK
-        swap_W = np.swapaxes(X, 0, 1)  # 变为(C,N,H,W)与
+        swap_W = np.swapaxes(X, 0, 1)  # 變為(C,N,H,W)與
         dW = self.convolution_forward(swap_W.astype(np.float64), padding_next_dX.astype(np.float64), np.zeros((D,), dtype=np.float64))
     
         # 偏置的梯度
@@ -173,7 +172,7 @@ class CNN:
     def maxpooling_forward(self, X, pooling, strides=(2, 2), padding=(0, 0)):
         """
         最大池化前向過程
-        :param X: 卷積層矩陣,形状(N,C,H,W)，N为batch_size，C為通道數
+        :param X: 卷積層矩陣,形狀(N,C,H,W)，N為batch_size，C為通道數
         :param pooling: 池化大小(k1,k2)
         :param strides: 步長
         :param padding: 0填充
@@ -183,7 +182,7 @@ class CNN:
         # 零填充
         padding_X = np.lib.pad(X, ((0, 0), (0, 0), (padding[0], padding[0]), (padding[1], padding[1])), 'constant', constant_values=0)
     
-        # 输出的高度和宽度
+        # 輸出的高度和寬度
         H_ = (H + 2 * padding[0] - pooling[0]) // strides[0] + 1
         W_ = (W + 2 * padding[1] - pooling[1]) // strides[1] + 1
     
@@ -200,10 +199,10 @@ class CNN:
     def maxpooling_backward(self, next_dX, X, pooling, strides=(2, 2), padding=(0, 0)):
         """
         最大池化反向過程
-        :param next_dX: 損失函數關於最大池化输出的損失
-        :param X: 卷積層矩陣,形状(N,C,H,W)，N為batch_size，C為通道數
+        :param next_dX: 損失函數關於最大池化輸出的損失
+        :param X: 卷積層矩陣,形狀(N,C,H,W)，N為batch_size，C為通道數
         :param pooling: 池化大小(k1,k2)
-        :param strides: 步长
+        :param strides: 步長
         :param padding: 0填充
         :return:
         """
@@ -284,7 +283,7 @@ class CNN:
     
     def cross_entropy_loss(self, y_probability, y_true):
         """
-        :param y_probability: 預測機率,shape (N,d)，N为批量样本数
+        :param y_probability: 預測機率,shape (N,d)，N為批量樣本數
         :param y_true: 真實值,shape(N,d)
         :return:
         """
