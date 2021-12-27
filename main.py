@@ -320,8 +320,8 @@ def shuffle_data(train_imgs_all, train_labels_all):
     
 if __name__ == '__main__': 
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
-    parser.add_argument('-l', "--lr", type=float, help="learning rate", default=0.1)
-    parser.add_argument("-e", "--epoch", type=int, help="total training epoch", default=10)
+    parser.add_argument('-l', "--lr", type=float, help="learning rate", default=0.05)
+    parser.add_argument("-e", "--epoch", type=int, help="total training epoch", default=30)
     parser.add_argument("-b", "--batch_size", type=int, help="batch size for training & testing", default = 16)
     args = parser.parse_args()
     print(args)
@@ -402,7 +402,7 @@ if __name__ == '__main__':
             for k in model.weights.keys():
                 best_weight[k] = model.weights[k]
                 
-        print('EPOCH:', e+1, ', train_loss:', round(train_avg_loss_list[-1], 4), ', val_loss:', round(val_avg_loss_list[-1], 4), ', val_acc:', 100 * round(correct_cnt/len(gt_total), 2), '%')
+        print('EPOCH:', e+1, ', train_loss:', round(train_avg_loss_list[-1], 4), ', val_loss:', round(val_avg_loss_list[-1], 4), ', val_acc:', round(100 * correct_cnt/len(gt_total), 2), '%')
     
     # testing
     model = CNN(kernel_size=5, kernel_depth=3, input_img_w_h=train_imgs_all.shape[2], fc_units=64, batch_size=args.batch_size, lr=args.lr, weights={})
@@ -427,4 +427,12 @@ if __name__ == '__main__':
     for i in range(0, len(gt_total), 1):
         if gt_total[i] == pred_total[i]:
                 correct_cnt += 1
-    print('Testing accuracy:', 100 * round(correct_cnt/len(gt_total), 2), '%')
+    print('select epoch:', select_epoch)
+    print('Testing accuracy:', round(100 * correct_cnt/len(gt_total), 2), '%')
+    plt.figure()
+    plt.plot(np.arange(args.epoch), train_avg_loss_list, color = 'r', label="training loss")
+    plt.plot(np.arange(args.epoch), val_avg_loss_list, color = 'b', label="validation loss")
+    plt.legend(loc='upper right')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.savefig('train_val_loss.png')
